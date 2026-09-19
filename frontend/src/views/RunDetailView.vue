@@ -1,26 +1,19 @@
 <template>
   <div class="page">
     <h2 class="page-title">批次详情</h2>
-    <p class="page-desc">查看批次状态、参与义务、净头寸，并可确认 settle</p>
+    <p class="page-desc">查看批次状态、参与义务与净头寸；操作员可对 COMPLETED 批次确认 settle</p>
 
     <div class="toolbar">
       <el-button @click="$router.back()">返回</el-button>
       <el-button @click="load">刷新</el-button>
       <el-button
+        v-if="auth.isOperator"
         type="success"
-        :disabled="(!auth.isOperator && !auth.allowViewerSettle) || detail?.run?.status !== 'COMPLETED' || alreadySettled"
+        :disabled="detail?.run?.status !== 'COMPLETED' || alreadySettled"
         :loading="settling"
         @click="settle"
       >确认 Settle</el-button>
-      <span v-if="!auth.isOperator" class="page-desc" style="margin-left:8px">只读也可 settle（临时）</span>
     </div>
-    <el-alert
-      v-if="viewerSettleHint"
-      style="margin:12px 0"
-      type="warning"
-      :closable="false"
-      :title="viewerSettleHint"
-    />
 
     <div class="card-panel" v-loading="loading">
       <template v-if="detail">
@@ -81,14 +74,6 @@ const alreadySettled = computed(() =>
   (detail.value?.obligations || []).every((o) => o.status === 'SETTLED') &&
   (detail.value?.obligations || []).length > 0
 )
-
-const viewerSettleHint = computed(() => {
-  if (auth.isOperator) return ''
-  if (!auth.allowViewerSettle) return '只读不可 settle'
-  if (alreadySettled.value) return '已结算'
-  if (detail.value?.run?.status === 'COMPLETED') return '只读账号也可确认 settle（临时放开）'
-  return '只读账号：当前批次不可 settle'
-})
 
 function formatTime(v) {
   return v ? new Date(v).toLocaleString() : '-'

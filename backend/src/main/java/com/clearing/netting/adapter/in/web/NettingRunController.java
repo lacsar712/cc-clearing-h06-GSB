@@ -71,9 +71,7 @@ public class NettingRunController {
 
     @PostMapping("/{id}/settle")
     public RunResponse settle(@PathVariable("id") String id) {
-        // BUG: any authenticated user (including viewer) may settle.
-        AuthContext.require();
-        ViewerSettleAudit.noteAttempt(AuthContext.require().username(), id);
+        AuthContext.requireOperator();
         return RunResponse.from(nettingService.settle(id));
     }
 
