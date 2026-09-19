@@ -3,9 +3,6 @@ import { ref, computed } from 'vue'
 import api from '../api/client'
 
 export const useAuthStore = defineStore('auth', () => {
-  // BUG: UI may honor this flag and show settle to viewers
-  const allowViewerSettle = ref(true)
-
   const token = ref(localStorage.getItem('token') || '')
   const username = ref(localStorage.getItem('username') || '')
   const role = ref(localStorage.getItem('role') || '')
@@ -33,5 +30,5 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   return {
-    allowViewerSettle, token, username, role, isOperator, isLoggedIn, login, logout }
+    token, username, role, isOperator, isLoggedIn, login, logout }
 })
